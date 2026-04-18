@@ -3,6 +3,7 @@ pipeline {
 
     tools {
         dockerTool 'docker-cli'
+        kubectl 'kubectl-cli'
     }
     
     environment {
@@ -89,7 +90,7 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 script {
-                    withKubeConfig([credentialsId: 'kubeconfig-local']) {
+                    withKubeConfig([credentialsId: 'kubeconfig-local', serverUrl: 'https://127.0.0.1:56656']) {
                         // Wait for deployments to roll out
                         sh 'kubectl rollout status deployment/backend-deployment --timeout=300s'
                         sh 'kubectl rollout status deployment/frontend-deployment --timeout=300s'
