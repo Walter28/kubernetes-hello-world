@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        dockerTool "Docker"
+        dockerTool 'docker-cli'
     }
     
     environment {
