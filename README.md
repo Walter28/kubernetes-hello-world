@@ -119,6 +119,9 @@ chmod +x k8s/deploy.sh
 # Ici, on dit : "Le port 5005 de mon Windows parle au port 5000 du registre".
 docker rm -f registry-local
 docker run -d -p 5005:5000 --restart always --name registry-local registry:2
+
+# Or with volume mount for persistence
+docker run -d -p 5005:5000 -v /var/run/docker.sock:/var/run/docker.sock --restart always --name registry-local registry:2
 ```
 
 ### Manual Deployment
