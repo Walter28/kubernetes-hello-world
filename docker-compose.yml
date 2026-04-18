@@ -1,0 +1,60 @@
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      tags:
+        - hello-world-backend:latest
+        - hello-world-backend:1.0.0
+    container_name: hello-world-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5000', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - hello-world-network
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      tags:
+        - hello-world-frontend:latest
+        - hello-world-frontend:1.0.0
+    container_name: hello-world-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - hello-world-network
+    
+networks:
+  hello-world-network:
+    driver: bridge
+    name: hello-world-network
+
+# volumes:
+  # No persistent volumes needed for this simple app
+  # Using tmpfs for temporary storage only
