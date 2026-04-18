@@ -64,6 +64,17 @@ pipeline {
                 }
             }
         }
+
+        stage('Setup Kubectl') {
+            steps {
+                script {
+                    sh 'curl -LO "https://k8s.io(curl -L -s https://k8s.io)/bin/linux/amd64/kubectl"'
+                    sh 'chmod +x ./kubectl'
+                    // Use ./kubectl to run commands
+                    sh './kubectl get pods'
+                }
+            }
+        }
         
         stage('Update Kubernetes Deployments') {
             steps {
@@ -80,7 +91,7 @@ pipeline {
                     
                     // Apply updated deployments
                     withKubeConfig([credentialsId: 'kubeconfig-local']) {
-                        sh 'kubectl apply -f k8s/'
+                        sh './kubectl apply -f k8s/'
                     }
                 }
             }
@@ -89,17 +100,17 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 script {
-                    withKubeConfig([credentialsId: 'kubeconfig-local', serverUrl: 'https://127.0.0.1:56656']) {
+                    withKubeConfig([credentialsId: 'kubeconfig-local']) {
                         // Wait for deployments to roll out
-                        sh 'kubectl rollout status deployment/backend-deployment --timeout=300s'
-                        sh 'kubectl rollout status deployment/frontend-deployment --timeout=300s'
+                        sh './kubectl rollout status deployment/backend-deployment --timeout=300s'
+                        sh './kubectl rollout status deployment/frontend-deployment --timeout=300s'
                         
                         // Check pod status
-                        sh 'kubectl get pods -l component=backend'
-                        sh 'kubectl get pods -l component=frontend'
+                        sh './kubectl get pods -l component=backend'
+                        sh './kubectl get pods -l component=frontend'
                         
                         // Check services
-                        sh 'kubectl get services'
+                        sh './kubectl get services'
                     }
                 }
             }
