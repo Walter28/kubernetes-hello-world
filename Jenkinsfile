@@ -1,5 +1,9 @@
 pipeline {
     agent any
+
+    tools {
+        docker 'Docker'
+    }
     
     environment {
         DOCKER_REGISTRY = 'localhost:5000'  // Change to your registry
@@ -113,9 +117,9 @@ pipeline {
         
         failure {
             echo 'Pipeline failed!'
-            mail to: 'devops@example.com',
-                 subject: "Jenkins Pipeline Failed: ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
-                 body: "The pipeline failed at build ${env.BUILD_NUMBER}. Please check the logs."
+            // mail to: 'devops@example.com',
+            //      subject: "Jenkins Pipeline Failed: ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
+            //      body: "The pipeline failed at build ${env.BUILD_NUMBER}. Please check the logs."
         }
         
         always {
