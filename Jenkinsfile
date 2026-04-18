@@ -3,7 +3,6 @@ pipeline {
 
     tools {
         dockerTool 'docker-cli'
-        kubectl 'kubectl-cli'
     }
     
     environment {
