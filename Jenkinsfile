@@ -21,6 +21,13 @@ pipeline {
                 checkout scm
             }
         }
+
+        stage('Fix Permissions') {
+            steps {
+                // Cette commande tente de forcer l'accès au socket avant de builder
+                sh "sudo chmod 666 /var/run/docker.sock || true" 
+            }
+        }
         
         stage('Build Backend Image') {
             steps {
@@ -72,7 +79,7 @@ pipeline {
                     """
                     
                     // Apply updated deployments
-                    withKubeConfig([credentialsId: 'kubeconfig']) {
+                    withKubeConfig([credentialsId: 'kubeconfig-local']) {
                         sh 'kubectl apply -f k8s/'
                     }
                 }
@@ -82,7 +89,7 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 script {
-                    withKubeConfig([credentialsId: 'kubeconfig']) {
+                    withKubeConfig([credentialsId: 'kubeconfig-local']) {
                         // Wait for deployments to roll out
                         sh 'kubectl rollout status deployment/backend-deployment --timeout=300s'
                         sh 'kubectl rollout status deployment/frontend-deployment --timeout=300s'
