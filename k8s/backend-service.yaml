@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: hello-world
+spec:
+  type: ClusterIP # Only accessible inside the cluster
+  selector:
+    component: backend
+  ports:
+    - port: 5000
+      targetPort: 5000

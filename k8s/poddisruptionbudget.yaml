@@ -1,0 +1,21 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: backend-pdb
+  namespace: hello-world
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      component: backend
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: frontend-pdb
+  namespace: hello-world
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      component: frontend

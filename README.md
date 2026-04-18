@@ -97,6 +97,72 @@ docker run -p 3000:3000 hello-world-frontend:latest
 - **Proper tagging** with semantic versions
 - **Optimized .dockerignore** files
 
+## Kubernetes Deployment
+
+### Prerequisites
+- Kubernetes cluster running
+- kubectl configured
+- Docker registry (local or remote)
+
+### Quick Deploy with Script
+```bash
+# Make script executable
+chmod +x k8s/deploy.sh
+
+# Run deployment
+./k8s/deploy.sh
+```
+
+### Manual Deployment
+```bash
+# Build and push images
+docker build -t hello-world-backend:1.0.0 ./server
+docker build -t hello-world-frontend:1.0.0 ./client
+
+# Update image names in k8s/*.yaml files
+# Apply to Kubernetes
+kubectl apply -f k8s/
+
+# Check status
+kubectl get pods
+kubectl get services
+kubectl get ingress
+```
+
+### Kubernetes Resources
+- **Backend Deployment**: 2 replicas with resource limits
+- **Frontend Deployment**: 2 replicas with resource limits  
+- **Services**: ClusterIP for internal communication
+- **Ingress**: External access with routing rules
+
+## Jenkins CI/CD
+
+### Setup Requirements
+- Jenkins server with Docker installed
+- Kubernetes plugin configured
+- Docker registry credentials
+- kubeconfig credentials
+
+### Pipeline Features
+- **Multi-stage Docker builds** for optimized images
+- **Automated image tagging** with build numbers
+- **Kubernetes deployment updates** with rolling updates
+- **Health checks** and verification
+- **Cleanup** of intermediate resources
+
+### Pipeline Stages
+1. **Checkout** - Source code
+2. **Build Images** - Backend and Frontend
+3. **Push Images** - To Docker registry
+4. **Update Deployments** - Apply to Kubernetes
+5. **Verify** - Check pod status and services
+6. **Cleanup** - Remove temporary resources
+
+### Jenkins Configuration
+Add these credentials in Jenkins:
+- `kubeconfig-local` - Kubernetes configuration file
+- Docker registry credentials for pushing images
+
 ## How it works
 
 1. React frontend makes a GET request to `/api/hello`

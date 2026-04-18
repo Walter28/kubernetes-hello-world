@@ -1,0 +1,57 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: hello-world
+
+resources:
+  - namespace.yaml
+  - limitrange.yaml
+  - resourcequota.yaml
+  - networkpolicy.yaml
+  - poddisruptionbudget.yaml
+  - backend-deployment.yaml
+  - backend-service.yaml
+  - frontend-deployment.yaml
+  - frontend-service.yaml
+  - ingress-service.yaml
+  - hpa.yaml
+
+labels:
+  - pairs:
+      app: hello-world
+      version: v1
+
+configMapGenerator:
+  - name: app-config
+    literals:
+      - NODE_ENV=production
+      - PORT=5000
+      - REACT_APP_API_URL=/api
+
+secretGenerator:
+  - name: app-secrets
+    literals:
+      - DATABASE_URL=postgresql://user:pass@db.example.com/appdb
+      - JWT_SECRET=super-secret-jwt-key-for-hello-world
+
+images:
+  - name: kubernetes-hello-world-backend
+    newTag: latest
+  - name: kubernetes-hello-world-frontend
+    newTag: latest
+
+patches:
+  - patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+    target:
+      kind: Deployment
+      name: backend-deployment
+  - patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+    target:
+      kind: Deployment
+      name: frontend-deployment
