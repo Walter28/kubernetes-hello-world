@@ -113,6 +113,14 @@ chmod +x k8s/deploy.sh
 ./k8s/deploy.sh
 ```
 
+### Setup your local device as a Docker Registry
+```bash
+# Run a local Docker registry
+# Ici, on dit : "Le port 5005 de mon Windows parle au port 5000 du registre".
+docker rm -f registry-local
+docker run -d -p 5005:5000 --restart always --name registry-local registry:2
+```
+
 ### Manual Deployment
 ```bash
 # Build and push images

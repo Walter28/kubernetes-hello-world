@@ -6,7 +6,7 @@ pipeline {
     }
     
     environment {
-        DOCKER_REGISTRY = 'localhost:5000'  // Change to your registry
+        DOCKER_REGISTRY = 'host.docker.internal:5005'  // Change to your registry
         BACKEND_IMAGE = 'hello-world-backend'
         FRONTEND_IMAGE = 'hello-world-frontend'
         IMAGE_TAG = "1.0.${BUILD_NUMBER}"
