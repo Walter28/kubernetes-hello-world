@@ -1,0 +1,48 @@
+// Jenkinsfile - Mis à jour pour le déploiement sur Kubernetes
+pipeline {
+    agent any
+
+    environment {
+        // Remplacez par l'URL de votre registry Docker
+        DOCKER_REGISTRY = "votre-registry"
+        KUBE_CONFIG = credentials('kubeconfig-local') // ID du credential K8s
+    }
+
+    stages {
+        // ... Stages Checkout, Build, Test, SonarQube ...
+
+        stage('Build & Push Docker Image') {
+            steps {
+                script {
+                    // Construire l'image du backend
+                    def backendImage = docker.build("${DOCKER_REGISTRY}/votre-backend:${env.BUILD_NUMBER}")
+                    // S'authentifier et pousser l'image
+                    docker.withRegistry("https://index.docker.io/v1/", 'docker-hub-credentials') {
+                        backendImage.push()
+                    }
+                    // (Faire de même pour l'image frontend si nécessaire)
+                }
+            }
+        }
+
+        // --- NOUVELLE ÉTAPE ---
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Utiliser la configuration kubectl stockée dans les credentials
+                    sh "cp \$KUBE_CONFIG ~/.kube/config"
+
+                    // Mettre à jour le fichier de déploiement avec la nouvelle image
+                    // C'est une méthode simple, des outils comme Kustomize ou Helm sont mieux
+                    sh "sed -i 's|image: .*|image: ${DOCKER_REGISTRY}/votre-backend:${env.BUILD_NUMBER}|g' k8s/backend-deployment.yaml"
+                    
+                    // Appliquer les changements au cluster
+                    sh 'kubectl apply -f k8s/'
+
+                    // Optionnel : vérifier que le déploiement est réussi
+                    sh 'kubectl rollout status deployment/backend-deployment'
+                }
+            }
+        }
+    }
+}
